@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MIXLAB — Paint Mixing Assistant</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Georgia, serif;
+            background: #f3eee4;
+            color: #302a27;
+        }
+
+        header {
+            padding: 30px 8%;
+            border-bottom: 1px solid #d8cfc2;
+        }
+
+        .logo {
+            font-size: 30px;
+            letter-spacing: 6px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            margin-top: 7px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: #776d65;
+        }
+
+        main {
+            width: 84%;
+            max-width: 1000px;
+            margin: 45px auto;
+        }
+
+        .hero {
+            margin-bottom: 35px;
+        }
+
+        .hero h1 {
+            font-size: 46px;
+            font-weight: normal;
+            margin: 0 0 10px;
+        }
+
+        .hero p {
+            color: #776d65;
+            font-size: 16px;
+        }
+
+        .studio {
+            background: #faf7f1;
+            border: 1px solid #ddd4c8;
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow: 0 12px 35px rgba(70, 55, 45, 0.08);
+        }
+
+        .section-title {
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #776d65;
+            margin-bottom: 15px;
+        }
+
+        .target-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .colour-picker {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 8px solid white;
+            box-shadow: 0 6px 20px rgba(70, 55, 45, 0.15);
+            background: #c8785c;
+            cursor: pointer;
+        }
+
+        .inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 13px;
+            color: #776d65;
+        }
+
+        input {
+            padding: 12px 15px;
+            border: 1px solid #d8cfc2;
+            border-radius: 10px;
+            background: #fffdf9;
+            font-size: 16px;
+            width: 180px;
+        }
+
+        .amount-unit {
+            display: flex;
+            gap: 8px;
+        }
+
+        select {
+            border: 1px solid #d8cfc2;
+            border-radius: 10px;
+            background: #fffdf9;
+            padding: 10px;
+        }
+
+        .palette {
+            margin-top: 35px;
+        }
+
+        .paint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .paint {
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #d8cfc2;
+            background: #fffdf9;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .paint:hover {
+            transform: translateY(-3px);
+        }
+
+        .paint.selected {
+            border: 2px solid #302a27;
+        }
+
+        .swatch {
+            height: 60px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .paint-name {
+            font-size: 13px;
+        }
+
+        button {
+            margin-top: 30px;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 12px;
+            background: #302a27;
+            color: white;
+            font-family: Georgia, serif;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .result {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #ddd4c8;
+        }
+
+        .result-colour {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            margin: 20px auto;
+            background: #e4ddd2;
+            border: 8px solid white;
+            box-shadow: 0 8px 25px rgba(70, 55, 45, 0.15);
+        }
+
+        .recipe {
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .recipe-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 5px;
+            border-bottom: 1px solid #e2d9ce;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">MIXLAB</div>
+    <div class="subtitle">
+        PAINT MIXING ASSISTANT · ARTIST'S STUDIO
+    </div>
+</header>
+
+<main>
+
+    <div class="hero">
+        <h1>Make the colour you need.</h1>
+        <p>
+            Tell MIXLAB what colour you want and how much paint you need.
+            We'll build the recipe.
+        </p>
+    </div>
+
+    <div class="studio">
+
+        <div class="section-title">01 · Target colour</div>
+
+        <div class="target-box">
+
+    <input
+        type="color"
+        id="targetColour"
+        class="colour-picker"
+        value="#c8785c"
+    >
+
+    <div class="inputs">
+
+        <label for="hexColour">
+            Target colour
+        </label>
+
+        <input
+            type="text"
+            id="hexColour"
+            value="#c8785c"
+            maxlength="7"
+            placeholder="#C8785C"
+        >
+
+        <label for="amount">
+            How much paint do you need?
+        </label>
+
+        <div class="amount-unit">
+
+            <input
+                type="number"
+                id="amount"
+                value="30"
+                min="1"
+            >
+
+            <select id="unit">
+                <option>mL</option>
+                <option>g</option>
+                <option>oz</option>
+            </select>
+
+        </div>
+
+    </div>
+
+        </div><div class="target-box">
+
+    <input
+        type="color"
+        id="targetColour"
+        class="colour-picker"
+        value="#c8785c"
+    >
+
+    <div class="inputs">
+
+        <label for="hexColour">
+            Target colour
+        </label>
+
+        <input
+            type="text"
+            id="hexColour"
+            value="#c8785c"
+            maxlength="7"
+            placeholder="#C8785C"
+        >
+
+        <label for="amount">
+            How much paint do you need?
+        </label>
+
+        <div class="amount-unit">
+
+            <input
+                type="number"
+                id="amount"
+                value="30"
+                min="1"
+            >
+
+            <select id="unit">
+                <option>mL</option>
+                <option>g</option>
+                <option>oz</option>
+            </select>
+
+        </div>
+
+    </div>
+
+        <div class="palette">
+
+            <div class="section-title">
+                02 · Your paints
+            </div>
+
+            <p>
+                Select the paints you currently have.
+            </p>
+
+            <div class="paint-grid">
+
+                <button onclick="addPaint()">
+    + Add a paint
+                </button>
+        </div>
+
+
+        <button onclick="createRecipe()">
+            Create my recipe →
+        </button>
+
+
+        <div id="result" class="result hidden">
+
+            <div class="section-title">
+                03 · Your recipe
+            </div>
+
+            <div
+                id="resultColour"
+                class="result-colour">
+            </div>
+
+            <div class="recipe" id="recipe"></div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+    let selectedPaints = [];
+
+function selectPaint(paint) {
+
+    const paintName =
+        paint.querySelector(".paint-name").textContent;
+
+    paint.classList.toggle("selected");
+
+    if (selectedPaints.includes(paintName)) {
+
+        selectedPaints =
+            selectedPaints.filter(
+                name => name !== paintName
+            );
+
+    } else {
+
+        selectedPaints.push(paintName);
+
+    }
+
+    console.log(selectedPaints);
+}
+
+function createRecipe() {
+
+    const amount =
+        Number(document.getElementById("amount").value);
+
+    const unit =
+        document.getElementById("unit").value;
+
+    const target =
+        document.getElementById("targetColour").value;
+
+    const result =
+        document.getElementById("result");
+
+    const resultColour =
+        document.getElementById("resultColour");
+
+    const recipe =
+        document.getElementById("recipe");
+
+
+    // Check whether the user selected enough paints
+
+    if (selectedPaints.length < 2) {
+
+        alert("Please select at least two paints.");
+
+        return;
+    }
+
+
+    // Example recipe proportions
+
+    const recipes = {
+
+    dustyRose: {
+        colour: "#B98282",
+        paints: {
+            "Burnt Sienna": 1,
+            "White": 2,
+            "Lemon Yellow": 0.2
+        }
+    },
+
+    terracotta: {
+        colour: "#C8785C",
+        paints: {
+            "Burnt Sienna": 2,
+            "Yellow Ochre": 1,
+            "White": 1
+        }
+    },
+
+    sageGreen: {
+        colour: "#9BA88D",
+        paints: {
+            "Lemon Yellow": 2,
+            "Black": 0.2,
+            "White": 2
+        }
+    },
+
+    mutedBlue: {
+        colour: "#7F9AA6",
+        paints: {
+            "White": 3,
+            "Black": 0.2
+        }
+    },
+
+    warmBeige: {
+        colour: "#C8B28A",
+        paints: {
+            "Yellow Ochre": 2,
+            "White": 3,
+            "Burnt Sienna": 0.3
+        }
+    }
+
+};
+
+
+    // Calculate how many total parts we have
+
+    let totalParts = 0;
+
+    selectedPaints.forEach(paint => {
+
+        if (proportions[paint]) {
+
+            totalParts += proportions[paint];
+
+        }
+
+    });
+
+
+    if (totalParts === 0) {
+
+        alert(
+            "This paint combination doesn't have a recipe yet."
+        );
+
+        return;
+    }
+
+
+    // Amount of paint represented by one part
+
+    const amountPerPart =
+        amount / totalParts;
+
+
+    // Show target colour
+
+    resultColour.style.background = target;
+
+    result.classList.remove("hidden");
+
+
+    // Build recipe
+
+    let recipeHTML = "";
+
+
+    selectedPaints.forEach(paint => {
+
+        if (proportions[paint]) {
+
+            const paintAmount =
+                proportions[paint] * amountPerPart;
+
+
+            recipeHTML += `
+
+                <div class="recipe-row">
+
+                    <span>${paint}</span>
+
+                    <strong>
+                        ${paintAmount.toFixed(1)} ${unit}
+                    </strong>
+
+                </div>
+
+            `;
+        }
+
+    });
+
+
+    recipe.innerHTML = `
+
+        <div class="recipe-row">
+
+            <span>Total paint</span>
+
+            <strong>
+                ${amount} ${unit}
+            </strong>
+
+        </div>
+
+        ${recipeHTML}
+
+    `;
+}
+  const colourPicker =
+    document.getElementById("targetColour");
+
+const hexInput =
+    document.getElementById("hexColour");
+
+
+colourPicker.addEventListener("input", function() {
+
+    hexInput.value = colourPicker.value;
+
+});
+
+
+hexInput.addEventListener("input", function() {
+
+    const value = hexInput.value;
+
+    if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+
+        colourPicker.value = value;
+
+    }
+
+});
+
+  function addPaint() {
+
+    const name = prompt("What is the name of this paint?");
+
+    if (!name) {
+        return;
+    }
+
+    const colour = prompt(
+        "Enter the HEX colour of the paint.\nExample: #8B4513"
+    );
+
+    if (!/^#[0-9A-Fa-f]{6}$/.test(colour)) {
+
+        alert("Please enter a valid HEX colour.");
+
+        return;
+    }
+
+
+    const paintGrid =
+        document.getElementById("paintGrid");
+
+
+    const paint =
+        document.createElement("div");
+
+    paint.className = "paint";
+
+    paint.onclick = function() {
+        selectPaint(paint);
+    };
+
+
+    paint.innerHTML = `
+
+        <div
+            class="swatch"
+            style="background:${colour};">
+        </div>
+
+        <div class="paint-name">
+            ${name}
+        </div>
+
+    `;
+
+
+    paintGrid.appendChild(paint);
+  }
+    
+</script>
+
+</body>
+</html>
